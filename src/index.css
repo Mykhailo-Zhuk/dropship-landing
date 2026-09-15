@@ -1,0 +1,92 @@
+/* ============================================================
+   Глобальні стилі лендінгу
+   Tailwind CSS v4 — налаштування теми через директиву @theme
+   ============================================================ */
+@import 'tailwindcss';
+
+@theme {
+  /* Фірмові кольори (можна змінити під свій бренд) */
+  --color-accent: #d9f24b; /* кислотний лайм — основний акцент */
+  --color-accent-dark: #b7d62e; /* акцент для hover-станів */
+  --color-ink: #101418; /* майже чорний — основний текст */
+  --color-cream: #f6f4ef; /* теплий світлий фон секцій */
+
+  /* Шрифти: Unbounded — заголовки, Manrope — основний текст */
+  --font-display: 'Unbounded', 'Manrope', system-ui, sans-serif;
+  --font-sans: 'Manrope', system-ui, -apple-system, sans-serif;
+}
+
+/* Плавний скрол до якорів (кнопки «Замовити» тощо) */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Відступ секцій під фіксованою шапкою при якірному скролі */
+section[id] {
+  scroll-margin-top: 88px;
+}
+
+/* Приховуємо скролбар у горизонтальному слайдері галереї */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================================
+   Анімації появи секцій (клас .reveal додається через useInView)
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Поява контенту Hero одразу після завантаження */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease both;
+}
+.animation-delay-150 {
+  animation-delay: 0.15s;
+}
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+
+/* Плавна зміна кольору кнопок */
+button,
+a {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease,
+    border-color 0.2s ease;
+}
+button:active {
+  transform: scale(0.97);
+}

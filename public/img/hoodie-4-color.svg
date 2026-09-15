@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d2128"/>
+      <stop offset="100%" stop-color="#262b33"/>
+    </linearGradient>
+    <linearGradient id="bodyG" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#d6c8a9"/>
+      <stop offset="100%" stop-color="#c9b896"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <!-- тінь на підлозі -->
+  <ellipse cx="400" cy="925" rx="230" ry="28" fill="#101418" opacity="0.08"/>
+  <!-- капюшон (задній шар) -->
+  <path d="M 250 350 C 225 170 575 170 550 350 C 525 315 465 285 400 285 C 335 285 275 315 250 350 Z" fill="#d6c8a9"/>
+  <!-- рукави -->
+  <path d="M 285 335 L 168 432 L 152 530 L 232 478 L 305 425 Z" fill="#c9b896"/>
+  <path d="M 515 335 L 632 432 L 648 530 L 568 478 L 495 425 Z" fill="#c9b896"/>
+  <!-- манжети -->
+  <rect x="138" y="512" width="82" height="36" rx="18" fill="#c9b896" stroke="#101418" stroke-opacity="0.15"/>
+  <rect x="580" y="512" width="82" height="36" rx="18" fill="#c9b896" stroke="#101418" stroke-opacity="0.15"/>
+  <!-- тіло -->
+  <path d="M 285 335 Q 400 282 515 335 L 545 470 L 540 815 Q 400 855 260 815 L 255 470 Z" fill="url(#bodyG)"/>
+  <!-- низ (гумка) -->
+  <rect x="255" y="792" width="290" height="44" rx="22" fill="#c9b896" stroke="#101418" stroke-opacity="0.15"/>
+  <!-- кишеня кенгуру -->
+  <path d="M 300 625 L 500 625 Q 505 625 505 630 L 505 745 Q 505 755 495 755 L 305 755 Q 295 755 295 745 L 295 630 Q 295 625 300 625 Z" fill="#c9b896" stroke="#101418" stroke-opacity="0.18" stroke-width="4"/>
+  <!-- шнурки -->
+  <path d="M 372 300 L 364 505" stroke="#d9f24b" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 428 300 L 436 505" stroke="#d9f24b" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="362" cy="513" r="9" fill="#d9f24b"/>
+  <circle cx="438" cy="513" r="9" fill="#d9f24b"/>
+  <!-- логотип на грудях -->
+  <text x="400" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" font-weight="800" letter-spacing="8" fill="#d9f24b">MIST</text>
+</svg>

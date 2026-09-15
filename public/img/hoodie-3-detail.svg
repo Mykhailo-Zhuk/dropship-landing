@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e5e1d7"/>
+      <stop offset="100%" stop-color="#f3f0e9"/>
+    </linearGradient>
+    <pattern id="knit" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="46" height="46" fill="none"/>
+      <path d="M 0 23 Q 11.5 0 23 23 T 46 23" fill="none" stroke="#2b3341" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+      <path d="M 0 46 Q 11.5 23 23 46 T 46 46" fill="none" stroke="#2b3341" stroke-width="6" stroke-linecap="round" opacity="0.35"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <!-- полотно тканини -->
+  <rect x="70" y="70" width="660" height="860" rx="48" fill="#2b3341" opacity="0.92"/>
+  <rect x="70" y="70" width="660" height="860" rx="48" fill="url(#knit)"/>
+  <!-- складка тканини -->
+  <path d="M 180 130 C 260 300 200 420 260 560" fill="none" stroke="#101418" stroke-opacity="0.15" stroke-width="14" stroke-linecap="round"/>
+  <!-- бейдж із характеристиками -->
+  <g transform="translate(400 640)">
+    <circle r="150" fill="#d9f24b"/>
+    <circle r="150" fill="none" stroke="#101418" stroke-opacity="0.15" stroke-width="4"/>
+    <text y="-58" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="800" fill="#101418">400 г/м²</text>
+    <text y="-14" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#101418">Футер 3-нитка</text>
+    <text y="24" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#101418" opacity="0.75">80% бавовна</text>
+    <text y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#101418" opacity="0.75">20% поліестер</text>
+  </g>
+</svg>
