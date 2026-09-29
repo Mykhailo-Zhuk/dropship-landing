@@ -90,3 +90,25 @@ a {
 button:active {
   transform: scale(0.97);
 }
+
+/* Доступність: відключення анімацій при prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-fade-in-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  button,
+  a {
+    transition: none;
+  }
+}
+

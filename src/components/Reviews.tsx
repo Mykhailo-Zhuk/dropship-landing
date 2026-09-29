@@ -7,9 +7,17 @@ import { Reveal } from './Reveal'
 /** Маленький компонент зірок рейтингу (0–5) */
 function Stars({ rating }: { rating: number }) {
   return (
-    <div className="flex gap-0.5" aria-label={`Оцінка ${rating} з 5`}>
+    <div
+      role="img"
+      className="flex gap-0.5"
+      aria-label={`Оцінка ${rating} з 5`}
+    >
       {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={i < rating ? 'text-amber-400' : 'text-ink/15'}>
+        <span
+          key={i}
+          aria-hidden="true"
+          className={i < rating ? 'text-amber-400' : 'text-ink/15'}
+        >
           ★
         </span>
       ))}

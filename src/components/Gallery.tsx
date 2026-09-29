@@ -13,6 +13,7 @@ import { Reveal } from './Reveal'
 
 export function Gallery() {
   const [active, setActive] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
   const total = PRODUCT.images.length
 
   // Координата X початку дотику (для свайпів)
@@ -22,20 +23,23 @@ export function Gallery() {
   const next = useCallback(() => setActive((i) => (i + 1) % total), [total])
 
   /** Перехід до попереднього фото */
-  const prev = () => setActive((i) => (i - 1 + total) % total)
+  const prev = useCallback(() => setActive((i) => (i - 1 + total) % total), [total])
 
-  // Автопрокрутка: спрацьовує кожні 5 секунд
+  // Автопрокрутка: спрацьовує кожні 5 секунд (зупиняється при наведенні/дотику)
   useEffect(() => {
+    if (isPaused) return
     const timer = setInterval(next, 5000)
     return () => clearInterval(timer)
-  }, [next])
+  }, [next, isPaused])
 
   // Обробники свайпу: запам'ятовуємо початок дотику...
   const onTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true)
     touchStartX.current = e.touches[0].clientX
   }
   // ...і порівнюємо з кінцем: зсув > 50px = свайп
   const onTouchEnd = (e: React.TouchEvent) => {
+    setIsPaused(false)
     if (touchStartX.current === null) return
     const delta = e.changedTouches[0].clientX - touchStartX.current
     if (delta > 50) prev()
@@ -66,6 +70,8 @@ export function Gallery() {
             {/* Головний слайд */}
             <div
               className="relative overflow-hidden rounded-3xl border border-ink/5 shadow-xl shadow-ink/10"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
               onTouchStart={onTouchStart}
               onTouchEnd={onTouchEnd}
             >
@@ -78,7 +84,7 @@ export function Gallery() {
                   className={`aspect-[4/5] w-full object-cover transition-opacity duration-500 ${
                     i === active ? 'opacity-100' : 'pointer-events-none absolute inset-0 opacity-0'
                   }`}
-                  loading="lazy"
+                  loading={i === 0 ? 'eager' : 'lazy'}
                 />
               ))}
 
@@ -89,6 +95,7 @@ export function Gallery() {
 
               {/* Стрілка «назад» */}
               <button
+                type="button"
                 onClick={prev}
                 aria-label="Попереднє фото"
                 className="absolute top-1/2 left-3 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-cream/90 text-xl font-bold text-ink shadow-lg backdrop-blur-sm hover:bg-accent"
@@ -97,6 +104,7 @@ export function Gallery() {
               </button>
               {/* Стрілка «вперед» */}
               <button
+                type="button"
                 onClick={next}
                 aria-label="Наступне фото"
                 className="absolute top-1/2 right-3 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-cream/90 text-xl font-bold text-ink shadow-lg backdrop-blur-sm hover:bg-accent"
@@ -109,6 +117,7 @@ export function Gallery() {
             <div className="mt-4 flex justify-center gap-2">
               {PRODUCT.images.map((_, i) => (
                 <button
+                  type="button"
                   key={i}
                   onClick={() => setActive(i)}
                   aria-label={`Перейти до фото ${i + 1}`}
@@ -123,6 +132,7 @@ export function Gallery() {
             <div className="no-scrollbar mt-5 flex gap-3 overflow-x-auto pb-1 sm:justify-center">
               {PRODUCT.images.map((src, i) => (
                 <button
+                  type="button"
                   key={src}
                   onClick={() => setActive(i)}
                   aria-label={`Фото ${i + 1}`}

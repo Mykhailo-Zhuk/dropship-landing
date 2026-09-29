@@ -37,6 +37,7 @@ export function Faq() {
                 >
                   {/* Клікабельний заголовок питання */}
                   <button
+                    type="button"
                     onClick={() => setOpenIndex(isOpen ? null : i)}
                     aria-expanded={isOpen}
                     className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
@@ -44,6 +45,7 @@ export function Faq() {
                     <span className="font-bold sm:text-lg">{item.question}</span>
                     {/* Іконка «+» / «×» */}
                     <span
+                      aria-hidden="true"
                       className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-lg font-bold transition-transform duration-300 ${
                         isOpen
                           ? 'rotate-45 bg-accent text-ink'

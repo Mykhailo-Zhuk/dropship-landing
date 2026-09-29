@@ -73,7 +73,9 @@ export function Hero() {
           <img
             src={PRODUCT.images[0]}
             alt={`${PRODUCT.name} — фото товару`}
-            className="w-full rounded-3xl border border-cream/10 shadow-2xl shadow-black/50"
+            width={800}
+            height={1000}
+            className="aspect-[4/5] w-full rounded-3xl border border-cream/10 object-cover shadow-2xl shadow-black/50"
             loading="eager"
           />
           {/* Плаваюча картка з матеріалом */}

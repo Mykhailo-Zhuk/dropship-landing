@@ -13,7 +13,7 @@
 // Щоб зберігати замовлення, додай виклик свого бекенду:
 //   await fetch('/api/order', { method: 'POST', body: JSON.stringify(order) })
 // ============================================================
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PRODUCT } from '../data/product'
 import { createPayment } from '../lib/payment'
 import type { OrderData } from '../types'
@@ -37,14 +37,26 @@ export function OrderForm() {
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState(false)
 
+  // Перевірка повернення після оплати (якщо провайдер або заглушка повернули в хеш)
+  useEffect(() => {
+    if (
+      window.location.hash === '#payment-success' ||
+      window.location.hash === '#order-success'
+    ) {
+      setSuccess(true)
+    }
+  }, [])
+
   /** Оновлення одного поля форми */
   const update = (field: keyof OrderData, value: string | number) =>
     setOrder((o) => ({ ...o, [field]: value }))
 
-  /** Проста валідація: обов'язкові поля заповнені, телефон коректний */
+  /** Валідація: обов'язкові поля заповнені, телефон коректний */
   const validate = (): string => {
     if (order.name.trim().length < 2) return 'Вкажи своє ім’я'
-    if (!/^\+?[\d\s()-]{10,17}$/.test(order.phone.trim()))
+    const rawDigits = order.phone.replace(/\D/g, '')
+    const validFormat = /^[+\d\s().-]+$/.test(order.phone.trim())
+    if (!validFormat || rawDigits.length < 10 || rawDigits.length > 15)
       return 'Вкажи коректний номер телефону, наприклад 067 123 45 67'
     if (!order.size) return 'Обери розмір'
     if (order.city.trim().length < 2) return 'Вкажи місто'
@@ -69,12 +81,21 @@ export function OrderForm() {
         // Оплата карткою онлайн — створюємо платіж у платіжки
         // (заглушка; реальна інтеграція — див. src/lib/payment.ts)
         const payment = await createPayment(order)
-        // Редирект на платіжну сторінку провайдера
-        window.location.href = payment.url
+        if (
+          payment.url.startsWith('http://') ||
+          payment.url.startsWith('https://')
+        ) {
+          // Редирект на платіжну сторінку провайдера
+          window.location.href = payment.url
+          return
+        }
+        // Заглушка або внутрішній якір — показуємо екран успіху
+        window.location.hash = payment.url
+        setSuccess(true)
         return
       }
 
-      // Оплата при отриманні — просто показуємо успіх.
+      // Оплата при отриманні — показуємо успіх.
       // TODO: тут відправ замовлення на бекенд / у Telegram-бот.
       console.info('[order] Нове замовлення:', order)
       await new Promise((r) => setTimeout(r, 500)) // імітація запиту
@@ -211,11 +232,13 @@ export function OrderForm() {
                     <span className="mb-1.5 block text-sm font-bold">Ім'я *</span>
                     <input
                       type="text"
+                      name="name"
                       value={order.name}
                       onChange={(e) => update('name', e.target.value)}
                       placeholder="Тарас"
                       className={inputCls}
                       autoComplete="name"
+                      required
                     />
                   </label>
 
@@ -226,11 +249,13 @@ export function OrderForm() {
                     </span>
                     <input
                       type="tel"
+                      name="phone"
                       value={order.phone}
                       onChange={(e) => update('phone', e.target.value)}
                       placeholder="067 123 45 67"
                       className={inputCls}
                       autoComplete="tel"
+                      required
                     />
                   </label>
 
@@ -239,9 +264,11 @@ export function OrderForm() {
                     <label className="block">
                       <span className="mb-1.5 block text-sm font-bold">Розмір *</span>
                       <select
+                        name="size"
                         value={order.size}
                         onChange={(e) => update('size', e.target.value)}
                         className={inputCls}
+                        required
                       >
                         <option value="">Обери…</option>
                         {PRODUCT.sizes.map((s) => (
@@ -254,6 +281,7 @@ export function OrderForm() {
                     <label className="block">
                       <span className="mb-1.5 block text-sm font-bold">Колір</span>
                       <select
+                        name="color"
                         value={order.color}
                         onChange={(e) => update('color', e.target.value)}
                         className={inputCls}
@@ -274,11 +302,13 @@ export function OrderForm() {
                     </span>
                     <input
                       type="text"
+                      name="city"
                       value={order.city}
                       onChange={(e) => update('city', e.target.value)}
                       placeholder="Київ"
                       className={inputCls}
                       autoComplete="address-level2"
+                      required
                     />
                   </label>
 
@@ -289,10 +319,12 @@ export function OrderForm() {
                     </span>
                     <input
                       type="text"
+                      name="postOffice"
                       value={order.postOffice}
                       onChange={(e) => update('postOffice', e.target.value)}
                       placeholder="№ 123, вул. Хрещатик, 1"
                       className={inputCls}
+                      required
                     />
                   </label>
 

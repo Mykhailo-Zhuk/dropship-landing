@@ -7,8 +7,13 @@
 import os
 from datetime import date
 
-ROOT = '/home/hermes/dropship-landing'
-OUT  = '/home/hermes/Obsidian/_inbox/dropship-landing-template.md'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+default_obsidian = os.path.expanduser('~/Obsidian/_inbox')
+if os.path.isdir(default_obsidian):
+    OUT = os.path.join(default_obsidian, 'dropship-landing-template.md')
+else:
+    OUT = os.environ.get('OBSIDIAN_OUT', os.path.join(ROOT, 'dist', 'dropship-landing-template.md'))
+
 
 # (шлях у проєкті, назва мови для підсвітки, короткий опис)
 FILES = [
