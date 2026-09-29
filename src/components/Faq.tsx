@@ -2,10 +2,11 @@
 // FAQ — акордеон із частими питаннями
 // ============================================================
 import { useState } from 'react'
-import { FAQS } from '../data/product'
+import { useLanguage } from '../i18n'
 import { Reveal } from './Reveal'
 
 export function Faq() {
+  const { t } = useLanguage()
   // Індекс відкритого питання (null = все закрито)
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
@@ -16,17 +17,18 @@ export function Faq() {
         <Reveal>
           <div className="text-center">
             <span className="text-xs font-bold tracking-widest text-ink/50 uppercase">
-              FAQ
+              {t.faq.subtitle}
             </span>
             <h2 className="font-display mt-3 text-2xl font-bold sm:text-4xl">
-              Часті <span className="text-accent-dark">питання</span>
+              {t.faq.titlePrefix}
+              <span className="text-accent-dark">{t.faq.titleAccent}</span>
             </h2>
           </div>
         </Reveal>
 
         {/* Список питань-відповідей */}
         <div className="mt-10 space-y-3">
-          {FAQS.map((item, i) => {
+          {t.faq.items.map((item, i) => {
             const isOpen = openIndex === i
             return (
               <Reveal key={item.id} delay={i * 60}>
@@ -56,7 +58,7 @@ export function Faq() {
                     </span>
                   </button>
 
-                  {/* Відповідь — плавно розгортається через grid-трюк */}
+                  {/* Відповідь */}
                   <div
                     className={`grid transition-all duration-300 ${
                       isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'

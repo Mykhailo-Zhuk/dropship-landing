@@ -1,8 +1,11 @@
 // ============================================================
 // Footer — підвал: бренд, контакти, способи оплати, копірайт
 // ============================================================
+import { useLanguage } from '../i18n'
 
 export function Footer() {
+  const { t } = useLanguage()
+
   return (
     <footer className="border-t border-cream/10 bg-ink py-12 text-cream/70">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -18,26 +21,45 @@ export function Footer() {
               </span>
             </a>
             <p className="mt-4 text-sm leading-relaxed text-cream/50">
-              Український бренд oversize-одягу. Виробляємо власними силами,
-              відправляємо по всій Україні.
+              {t.footer.brandDesc}
             </p>
           </div>
 
           {/* Навігація по сторінці */}
-          <nav aria-label="Навігація">
-            <h3 className="text-sm font-bold text-cream">Розділи</h3>
+          <nav aria-label={t.footer.sectionsTitle}>
+            <h3 className="text-sm font-bold text-cream">{t.footer.sectionsTitle}</h3>
             <ul className="mt-4 space-y-2 text-sm">
-              <li><a href="#benefits" className="hover:text-accent">Переваги</a></li>
-              <li><a href="#gallery" className="hover:text-accent">Галерея</a></li>
-              <li><a href="#reviews" className="hover:text-accent">Відгуки</a></li>
-              <li><a href="#faq" className="hover:text-accent">Питання</a></li>
-              <li><a href="#order" className="hover:text-accent">Замовити</a></li>
+              <li>
+                <a href="#benefits" className="hover:text-accent">
+                  {t.footer.navBenefits}
+                </a>
+              </li>
+              <li>
+                <a href="#gallery" className="hover:text-accent">
+                  {t.footer.navGallery}
+                </a>
+              </li>
+              <li>
+                <a href="#reviews" className="hover:text-accent">
+                  {t.footer.navReviews}
+                </a>
+              </li>
+              <li>
+                <a href="#faq" className="hover:text-accent">
+                  {t.footer.navFaq}
+                </a>
+              </li>
+              <li>
+                <a href="#order" className="hover:text-accent">
+                  {t.footer.navOrder}
+                </a>
+              </li>
             </ul>
           </nav>
 
-          {/* Контакти — заміни на свої реальні посилання */}
+          {/* Контакти */}
           <div>
-            <h3 className="text-sm font-bold text-cream">Контакти</h3>
+            <h3 className="text-sm font-bold text-cream">{t.footer.contactsTitle}</h3>
             <ul className="mt-4 space-y-2 text-sm">
               <li>
                 <a href="https://t.me/your_brand" className="hover:text-accent">
@@ -59,21 +81,21 @@ export function Footer() {
 
           {/* Способи оплати та доставка */}
           <div>
-            <h3 className="text-sm font-bold text-cream">Оплата та доставка</h3>
+            <h3 className="text-sm font-bold text-cream">
+              {t.footer.paymentDeliveryTitle}
+            </h3>
             <ul className="mt-4 space-y-2 text-sm">
-              <li>💳 LiqPay / Fondy / WayForPay</li>
-              <li>📦 Оплата при отриманні</li>
-              <li>🚚 Нова пошта — 1–3 дні</li>
+              <li>{t.footer.payCard}</li>
+              <li>{t.footer.payCod}</li>
+              <li>{t.footer.deliveryNp}</li>
             </ul>
           </div>
         </div>
 
         {/* Нижній рядок */}
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-cream/10 pt-6 text-xs text-cream/40 sm:flex-row">
-          <p>© {new Date().getFullYear()} MIST.UA. Всі права захищено.</p>
-          <p>
-            Зроблено з ❤️ в Україні · Шаблон лендінгу для дропшипінгу
-          </p>
+          <p>{t.footer.copyright(new Date().getFullYear())}</p>
+          <p>{t.footer.madeIn}</p>
         </div>
       </div>
     </footer>

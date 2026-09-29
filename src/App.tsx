@@ -4,6 +4,7 @@
 // Односторінковий лендінг товару, секції зверху вниз:
 //   Hero → Переваги → Галерея → Відгуки → FAQ → Форма → Footer
 // ============================================================
+import { LanguageProvider } from './i18n'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
 import { Benefits } from './components/Benefits'
@@ -15,17 +16,19 @@ import { Footer } from './components/Footer'
 
 export default function App() {
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main>
-        <Hero />
-        <Benefits />
-        <Gallery />
-        <Reviews />
-        <Faq />
-        <OrderForm />
-      </main>
-      <Footer />
-    </div>
+    <LanguageProvider>
+      <div className="min-h-screen">
+        <Header />
+        <main>
+          <Hero />
+          <Benefits />
+          <Gallery />
+          <Reviews />
+          <Faq />
+          <OrderForm />
+        </main>
+        <Footer />
+      </div>
+    </LanguageProvider>
   )
 }

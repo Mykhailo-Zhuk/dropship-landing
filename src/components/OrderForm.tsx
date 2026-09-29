@@ -1,38 +1,34 @@
 // ============================================================
 // OrderForm — форма замовлення
-// ------------------------------------------------------------
-// Поля: ім'я, телефон, розмір, колір, місто та відділення
-// Нової пошти, спосіб оплати (картка онлайн / при отриманні).
-//
-// Після сабміту:
-//  - дані валідуються (проста перевірка + маска телефону);
-//  - якщо обрано «Карткою онлайн» — викликається createPayment()
-//    із src/lib/payment.ts (заглушка) і робиться redirect;
-//  - якщо «При отриманні» — замовлення вважається створеним.
-//
-// Щоб зберігати замовлення, додай виклик свого бекенду:
-//   await fetch('/api/order', { method: 'POST', body: JSON.stringify(order) })
 // ============================================================
 import { useEffect, useState } from 'react'
-import { PRODUCT } from '../data/product'
+import { useLanguage } from '../i18n'
 import { createPayment } from '../lib/payment'
 import type { OrderData } from '../types'
 import { Reveal } from './Reveal'
 
-/** Початковий стан форми */
-const initialOrder: OrderData = {
-  name: '',
-  phone: '',
-  size: '',
-  color: PRODUCT.colors[0],
-  city: '',
-  postOffice: '',
-  paymentMethod: 'cod',
-  quantity: 1,
-}
-
 export function OrderForm() {
-  const [order, setOrder] = useState<OrderData>(initialOrder)
+  const { t, product, lang } = useLanguage()
+  const locale = lang === 'uk' ? 'uk-UA' : 'en-US'
+
+  const [order, setOrder] = useState<OrderData>({
+    name: '',
+    phone: '',
+    size: '',
+    color: product.colors[0],
+    city: '',
+    postOffice: '',
+    paymentMethod: 'cod',
+    quantity: 1,
+  })
+
+  // Оновлюємо колір при зміні мови, якщо поточний колір не знайдено в списку
+  useEffect(() => {
+    if (!product.colors.includes(order.color ?? '')) {
+      setOrder((prev) => ({ ...prev, color: product.colors[0] }))
+    }
+  }, [product.colors, order.color])
+
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -53,14 +49,14 @@ export function OrderForm() {
 
   /** Валідація: обов'язкові поля заповнені, телефон коректний */
   const validate = (): string => {
-    if (order.name.trim().length < 2) return 'Вкажи своє ім’я'
+    if (order.name.trim().length < 2) return t.order.errors.name
     const rawDigits = order.phone.replace(/\D/g, '')
     const validFormat = /^[+\d\s().-]+$/.test(order.phone.trim())
     if (!validFormat || rawDigits.length < 10 || rawDigits.length > 15)
-      return 'Вкажи коректний номер телефону, наприклад 067 123 45 67'
-    if (!order.size) return 'Обери розмір'
-    if (order.city.trim().length < 2) return 'Вкажи місто'
-    if (order.postOffice.trim().length < 2) return 'Вкажи відділення Нової пошти'
+      return t.order.errors.phone
+    if (!order.size) return t.order.errors.size
+    if (order.city.trim().length < 2) return t.order.errors.city
+    if (order.postOffice.trim().length < 2) return t.order.errors.postOffice
     return ''
   }
 
@@ -78,36 +74,29 @@ export function OrderForm() {
     setSending(true)
     try {
       if (order.paymentMethod === 'card') {
-        // Оплата карткою онлайн — створюємо платіж у платіжки
-        // (заглушка; реальна інтеграція — див. src/lib/payment.ts)
         const payment = await createPayment(order)
         if (
           payment.url.startsWith('http://') ||
           payment.url.startsWith('https://')
         ) {
-          // Редирект на платіжну сторінку провайдера
           window.location.href = payment.url
           return
         }
-        // Заглушка або внутрішній якір — показуємо екран успіху
         window.location.hash = payment.url
         setSuccess(true)
         return
       }
 
-      // Оплата при отриманні — показуємо успіх.
-      // TODO: тут відправ замовлення на бекенд / у Telegram-бот.
-      console.info('[order] Нове замовлення:', order)
-      await new Promise((r) => setTimeout(r, 500)) // імітація запиту
+      console.info('[order] New order:', order)
+      await new Promise((r) => setTimeout(r, 500))
       setSuccess(true)
     } catch {
-      setError('Щось пішло не так. Спробуй ще раз або напиши нам у Telegram.')
+      setError(t.order.errors.generic)
     } finally {
       setSending(false)
     }
   }
 
-  /** Спільні класи для полів вводу */
   const inputCls =
     'w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm outline-none transition-colors placeholder:text-ink/35 focus:border-accent-dark focus:ring-2 focus:ring-accent/40'
 
@@ -119,49 +108,42 @@ export function OrderForm() {
           <Reveal>
             <div>
               <span className="text-xs font-bold tracking-widest text-accent uppercase">
-                Оформлення замовлення
+                {t.order.subtitle}
               </span>
               <h2 className="font-display mt-3 text-2xl font-bold sm:text-4xl">
-                Замовляй за 1 хвилину
+                {t.order.title}
               </h2>
               <ul className="mt-6 space-y-4 text-cream/80">
                 <li className="flex items-start gap-3">
                   <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-sm font-bold text-ink">
                     1
                   </span>
-                  <p>
-                    Заповни форму — ми зателефонуємо для підтвердження протягом
-                    15 хвилин.
-                  </p>
+                  <p>{t.order.step1}</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-sm font-bold text-ink">
                     2
                   </span>
-                  <p>
-                    Відправимо Новою поштою у день замовлення. Доставка 1–3 дні.
-                  </p>
+                  <p>{t.order.step2}</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent text-sm font-bold text-ink">
                     3
                   </span>
-                  <p>
-                    Оплати при отриманні або карткою онлайн — як зручніше.
-                  </p>
+                  <p>{t.order.step3}</p>
                 </li>
               </ul>
 
               {/* Ціна та кількість */}
               <div className="mt-8 rounded-2xl border border-cream/10 bg-cream/5 p-5">
                 <div className="flex items-center justify-between">
-                  <span className="text-cream/60">Ціна за 1 шт:</span>
+                  <span className="text-cream/60">{t.order.pricePerItem}</span>
                   <span className="font-display text-xl font-bold text-accent">
-                    {PRODUCT.price.toLocaleString('uk-UA')} ₴
+                    {product.price.toLocaleString(locale)} ₴
                   </span>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
-                  <span className="text-cream/60">Кількість:</span>
+                  <span className="text-cream/60">{t.order.quantity}</span>
                   {/* Степпер кількості */}
                   <div className="flex items-center gap-3">
                     <button
@@ -169,16 +151,18 @@ export function OrderForm() {
                       onClick={() =>
                         update('quantity', Math.max(1, order.quantity - 1))
                       }
-                      aria-label="Зменшити кількість"
+                      aria-label={t.order.decreaseQtyAria}
                       className="grid h-9 w-9 place-items-center rounded-full bg-cream/10 text-lg font-bold hover:bg-accent hover:text-ink"
                     >
                       −
                     </button>
-                    <span className="w-6 text-center font-bold">{order.quantity}</span>
+                    <span className="w-6 text-center font-bold">
+                      {order.quantity}
+                    </span>
                     <button
                       type="button"
                       onClick={() => update('quantity', order.quantity + 1)}
-                      aria-label="Збільшити кількість"
+                      aria-label={t.order.increaseQtyAria}
                       className="grid h-9 w-9 place-items-center rounded-full bg-cream/10 text-lg font-bold hover:bg-accent hover:text-ink"
                     >
                       +
@@ -186,9 +170,9 @@ export function OrderForm() {
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-cream/10 pt-4">
-                  <span className="font-bold">Разом:</span>
+                  <span className="font-bold">{t.order.total}</span>
                   <span className="font-display text-2xl font-bold text-accent">
-                    {(PRODUCT.price * order.quantity).toLocaleString('uk-UA')} ₴
+                    {(product.price * order.quantity).toLocaleString(locale)} ₴
                   </span>
                 </div>
               </div>
@@ -208,34 +192,44 @@ export function OrderForm() {
                     ✅
                   </div>
                   <h3 className="font-display mt-4 text-xl font-bold">
-                    Замовлення прийнято!
+                    {t.order.successTitle}
                   </h3>
                   <p className="mx-auto mt-2 max-w-sm text-sm text-ink/60">
-                    Дякуємо, {order.name}! Ми зателефонуємо тобі протягом 15
-                    хвилин для підтвердження. Трек-номер надішлемо в SMS.
+                    {t.order.successDesc(order.name || '')}
                   </p>
                   <button
                     type="button"
                     onClick={() => {
                       setSuccess(false)
-                      setOrder(initialOrder)
+                      setOrder({
+                        name: '',
+                        phone: '',
+                        size: '',
+                        color: product.colors[0],
+                        city: '',
+                        postOffice: '',
+                        paymentMethod: 'cod',
+                        quantity: 1,
+                      })
                     }}
                     className="mt-6 rounded-full bg-ink px-6 py-3 text-sm font-bold text-cream hover:bg-ink/80"
                   >
-                    Оформити ще одне замовлення
+                    {t.order.orderAgainBtn}
                   </button>
                 </div>
               ) : (
                 <>
                   {/* Поле: ім'я */}
                   <label className="block">
-                    <span className="mb-1.5 block text-sm font-bold">Ім'я *</span>
+                    <span className="mb-1.5 block text-sm font-bold">
+                      {t.order.nameLabel}
+                    </span>
                     <input
                       type="text"
                       name="name"
                       value={order.name}
                       onChange={(e) => update('name', e.target.value)}
-                      placeholder="Тарас"
+                      placeholder={t.order.namePlaceholder}
                       className={inputCls}
                       autoComplete="name"
                       required
@@ -245,14 +239,14 @@ export function OrderForm() {
                   {/* Поле: телефон */}
                   <label className="mt-4 block">
                     <span className="mb-1.5 block text-sm font-bold">
-                      Телефон *
+                      {t.order.phoneLabel}
                     </span>
                     <input
                       type="tel"
                       name="phone"
                       value={order.phone}
                       onChange={(e) => update('phone', e.target.value)}
-                      placeholder="067 123 45 67"
+                      placeholder={t.order.phonePlaceholder}
                       className={inputCls}
                       autoComplete="tel"
                       required
@@ -262,7 +256,9 @@ export function OrderForm() {
                   {/* Розмір + колір в один рядок */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     <label className="block">
-                      <span className="mb-1.5 block text-sm font-bold">Розмір *</span>
+                      <span className="mb-1.5 block text-sm font-bold">
+                        {t.order.sizeLabel}
+                      </span>
                       <select
                         name="size"
                         value={order.size}
@@ -270,8 +266,8 @@ export function OrderForm() {
                         className={inputCls}
                         required
                       >
-                        <option value="">Обери…</option>
-                        {PRODUCT.sizes.map((s) => (
+                        <option value="">{t.order.sizeSelectPlaceholder}</option>
+                        {product.sizes.map((s) => (
                           <option key={s} value={s}>
                             {s}
                           </option>
@@ -279,14 +275,16 @@ export function OrderForm() {
                       </select>
                     </label>
                     <label className="block">
-                      <span className="mb-1.5 block text-sm font-bold">Колір</span>
+                      <span className="mb-1.5 block text-sm font-bold">
+                        {t.order.colorLabel}
+                      </span>
                       <select
                         name="color"
                         value={order.color}
                         onChange={(e) => update('color', e.target.value)}
                         className={inputCls}
                       >
-                        {PRODUCT.colors.map((c) => (
+                        {product.colors.map((c) => (
                           <option key={c} value={c}>
                             {c}
                           </option>
@@ -298,14 +296,14 @@ export function OrderForm() {
                   {/* Поле: місто */}
                   <label className="mt-4 block">
                     <span className="mb-1.5 block text-sm font-bold">
-                      Місто (Нова пошта) *
+                      {t.order.cityLabel}
                     </span>
                     <input
                       type="text"
                       name="city"
                       value={order.city}
                       onChange={(e) => update('city', e.target.value)}
-                      placeholder="Київ"
+                      placeholder={t.order.cityPlaceholder}
                       className={inputCls}
                       autoComplete="address-level2"
                       required
@@ -315,14 +313,14 @@ export function OrderForm() {
                   {/* Поле: відділення */}
                   <label className="mt-4 block">
                     <span className="mb-1.5 block text-sm font-bold">
-                      Відділення Нової пошти *
+                      {t.order.postOfficeLabel}
                     </span>
                     <input
                       type="text"
                       name="postOffice"
                       value={order.postOffice}
                       onChange={(e) => update('postOffice', e.target.value)}
-                      placeholder="№ 123, вул. Хрещатик, 1"
+                      placeholder={t.order.postOfficePlaceholder}
                       className={inputCls}
                       required
                     />
@@ -331,7 +329,7 @@ export function OrderForm() {
                   {/* Спосіб оплати */}
                   <div className="mt-4">
                     <span className="mb-1.5 block text-sm font-bold">
-                      Спосіб оплати
+                      {t.order.paymentLabel}
                     </span>
                     <div className="grid grid-cols-2 gap-3">
                       <label
@@ -349,7 +347,7 @@ export function OrderForm() {
                           onChange={() => update('paymentMethod', 'card')}
                           className="sr-only"
                         />
-                        💳 Карткою онлайн
+                        {t.order.payCard}
                       </label>
                       <label
                         className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 px-3 py-3 text-sm font-bold transition-colors ${
@@ -366,14 +364,12 @@ export function OrderForm() {
                           onChange={() => update('paymentMethod', 'cod')}
                           className="sr-only"
                         />
-                        📦 При отриманні
+                        {t.order.payCod}
                       </label>
                     </div>
                     {order.paymentMethod === 'card' && (
                       <p className="mt-2 text-xs text-ink/50">
-                        Оплата через LiqPay / Fondy / WayForPay — захищене
-                        з'єднання. Підключення описане у{' '}
-                        <code className="rounded bg-ink/5 px-1">src/lib/payment.ts</code>.
+                        {t.order.payCardNote}
                       </p>
                     )}
                   </div>
@@ -391,12 +387,15 @@ export function OrderForm() {
                     disabled={sending}
                     className="mt-6 w-full rounded-full bg-accent px-8 py-4 text-base font-extrabold text-ink shadow-lg shadow-accent/25 hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {sending ? 'Обробляємо…' : `Замовити за ${(PRODUCT.price * order.quantity).toLocaleString('uk-UA')} ₴`}
+                    {sending
+                      ? t.order.submitting
+                      : t.order.submitBtn(
+                          (product.price * order.quantity).toLocaleString(locale)
+                        )}
                   </button>
 
                   <p className="mt-3 text-center text-xs text-ink/45">
-                    Натискаючи кнопку, ти погоджуєшся з умовами обробки
-                    персональних даних.
+                    {t.order.termsText}
                   </p>
                 </>
               )}
